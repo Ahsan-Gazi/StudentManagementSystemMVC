@@ -1,0 +1,101 @@
+﻿@model PagedList.PagedList<StudentManagementSystem.Models.SemesterViewModel>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Index";
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<h2>Index</h2>
+<p>
+    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-primary btn-large" })
+</p>
+@using (Html.BeginForm("Index", "tblSemester", FormMethod.Get))
+{
+    <p>
+        Find By Name: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-primary" />
+    </p>
+}
+<table class="table">
+    <tr>
+        <th>
+            Semester Name
+        </th>
+        <th>
+            Course Duration
+        </th>
+        <th>
+            Course Fee
+        </th>
+        <th>
+            Student Id
+        </th>
+        <th>
+            Student Name
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SemesterName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Duration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fee)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StudentId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StudentName)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.SemesterId }) |
+                @*@Html.ActionLink("Details", "Details", new { id = item.SemesterId }) |*@
+                <a href="#" name="details" onclick="DetailsRecord('+@item.SemesterId+')">Details</a>
+                @Html.ActionLink("Delete", "Delete", new { id = item.SemesterId })
+            </td>
+        </tr>
+    }
+
+</table>
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)Of @Model.PageCount
+
+@Html.PagedListPager(Model,page=>Url.Action("Index",
+    new { page,SortOrder=ViewBag.CurrentSort, CurrentFilter= ViewBag.CurrentFilter }))
+
+<div id="partialDiv">
+    @if (ViewBag.Details == "Show")
+    {
+        @Html.Partial("_SemesterDetails", Model)
+        ViewBag.Details = "";
+    }
+
+</div>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    function DetailsRecord(id) {
+        $.ajax({
+            url: "/tblSemester/Details?SemesterId=" + id,
+            type: 'GET',
+            data: "",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $("#partialDiv").show();
+                $("#partialDiv").html(data);
+            },
+            error: function () {
+                alert("Error occured");
+            }
+        })
+    }
+
+</script>
